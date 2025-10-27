@@ -1,0 +1,5 @@
+{
+  "name": "AI Image Generator",
+  "description": "A sleek and modern web application that allows users to generate high-quality images from text prompts using Google's Gemini API (imagen-4.0-generate-001 model).",
+  "requestFramePermissions": []
+}
