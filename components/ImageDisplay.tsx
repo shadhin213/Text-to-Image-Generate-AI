@@ -6,6 +6,7 @@ import { DownloadIcon } from './icons/DownloadIcon';
 interface ImageDisplayProps {
   imageUrl: string | null;
   isLoading: boolean;
+  loadingMessage: string;
   error: string | null;
   prompt: string;
   aspectRatio: string;
@@ -19,7 +20,7 @@ const aspectRatioClasses: { [key: string]: string } = {
     '3:4': 'aspect-[3/4]',
 };
 
-export const ImageDisplay: React.FC<ImageDisplayProps> = ({ imageUrl, isLoading, error, prompt, aspectRatio }) => {
+export const ImageDisplay: React.FC<ImageDisplayProps> = ({ imageUrl, isLoading, loadingMessage, error, prompt, aspectRatio }) => {
   
   const handleDownload = () => {
     if (!imageUrl) return;
@@ -37,7 +38,7 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({ imageUrl, isLoading,
       return (
         <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
           <Spinner />
-          <p className="text-lg">Generating your masterpiece...</p>
+          <p className="text-lg text-center px-4">{loadingMessage}</p>
         </div>
       );
     }

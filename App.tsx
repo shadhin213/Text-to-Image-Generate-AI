@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Header } from './components/Header';
 import { PromptInput } from './components/PromptInput';
 import { ImageDisplay } from './components/ImageDisplay';
@@ -13,6 +13,45 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
+  const [loadingMessage, setLoadingMessage] = useState<string>('');
+  const loadingIntervalRef = useRef<number | null>(null);
+
+  const startLoadingIndicator = () => {
+    const messages = [
+        'Analyzing prompt...',
+        'Contacting AI art director...',
+        'Warming up the pixels...',
+        'Rendering your masterpiece...',
+        'Adding the final touches...',
+    ];
+    let messageIndex = 0;
+    setLoadingMessage(messages[messageIndex]);
+
+    if (loadingIntervalRef.current) {
+        clearInterval(loadingIntervalRef.current);
+    }
+
+    loadingIntervalRef.current = window.setInterval(() => {
+        messageIndex = (messageIndex + 1) % messages.length;
+        setLoadingMessage(messages[messageIndex]);
+    }, 2500);
+  };
+
+  const stopLoadingIndicator = () => {
+    if (loadingIntervalRef.current) {
+        clearInterval(loadingIntervalRef.current);
+        loadingIntervalRef.current = null;
+    }
+    setLoadingMessage('');
+  };
+
+  useEffect(() => {
+    return () => {
+        if (loadingIntervalRef.current) {
+            clearInterval(loadingIntervalRef.current);
+        }
+    };
+  }, []);
 
   const handleGenerateImage = useCallback(async () => {
     if (!prompt.trim() || isLoading) return;
@@ -21,6 +60,7 @@ const App: React.FC = () => {
     setError(null);
     setImageUrl(null);
     setGeneratedPrompt(prompt);
+    startLoadingIndicator();
 
     try {
       const url = await generateImageFromApi(prompt, aspectRatio);
@@ -31,6 +71,7 @@ const App: React.FC = () => {
       setError(`Failed to generate image. Please try again. Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
+      stopLoadingIndicator();
     }
   }, [prompt, isLoading, aspectRatio]);
 
@@ -41,6 +82,7 @@ const App: React.FC = () => {
         <ImageDisplay
           imageUrl={imageUrl}
           isLoading={isLoading}
+          loadingMessage={loadingMessage}
           error={error}
           prompt={generatedPrompt}
           aspectRatio={aspectRatio}
