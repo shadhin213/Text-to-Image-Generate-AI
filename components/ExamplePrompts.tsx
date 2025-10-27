@@ -8,9 +8,9 @@ interface ExamplePromptsProps {
 
 const PROMPTS = [
   "A majestic lion wearing a crown, cinematic style",
-  "A cute corgi working on a laptop, pixel art",
-  "Synthwave sunset over a retro-futuristic city",
-  "An enchanted forest library with glowing books",
+  "A cute corgi working on a laptop, high detail photography",
+  "A bustling futuristic city street at night, photorealistic",
+  "A cozy, sunlit library in an old victorian house, detailed",
 ];
 
 export const ExamplePrompts: React.FC<ExamplePromptsProps> = ({ onSelectPrompt, disabled }) => {

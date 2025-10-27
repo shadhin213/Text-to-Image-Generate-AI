@@ -2,14 +2,19 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Header } from './components/Header';
 import { PromptInput } from './components/PromptInput';
 import { ImageDisplay } from './components/ImageDisplay';
-import { generateImage as generateImageFromApi } from './services/geminiService';
+import { generateImages as generateImagesFromApi } from './services/geminiService';
 import { AspectRatioSelector } from './components/AspectRatioSelector';
 import { ExamplePrompts } from './components/ExamplePrompts';
+
+export interface GeneratedImage {
+    imageUrl: string;
+    style: string;
+}
 
 const App: React.FC = () => {
   const [prompt, setPrompt] = useState<string>('');
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrls, setImageUrls] = useState<GeneratedImage[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
@@ -19,9 +24,9 @@ const App: React.FC = () => {
   const startLoadingIndicator = () => {
     const messages = [
         'Analyzing prompt...',
-        'Contacting AI art director...',
-        'Warming up the pixels...',
-        'Rendering your masterpiece...',
+        'Contacting AI art directors...',
+        'Warming up the pixels for four masterpieces...',
+        'Rendering your creations...',
         'Adding the final touches...',
     ];
     let messageIndex = 0;
@@ -58,17 +63,17 @@ const App: React.FC = () => {
 
     setIsLoading(true);
     setError(null);
-    setImageUrl(null);
+    setImageUrls(null);
     setGeneratedPrompt(prompt);
     startLoadingIndicator();
 
     try {
-      const url = await generateImageFromApi(prompt, aspectRatio);
-      setImageUrl(url);
+      const urls = await generateImagesFromApi(prompt, aspectRatio);
+      setImageUrls(urls);
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
       console.error("Generation failed:", errorMessage);
-      setError(`Failed to generate image. Please try again. Error: ${errorMessage}`);
+      setError(`Failed to generate images. Please try again. Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
       stopLoadingIndicator();
@@ -78,9 +83,9 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-900 text-gray-200 flex flex-col items-center p-4 sm:p-6 lg:p-8">
       <Header />
-      <main className="flex flex-col items-center justify-center w-full max-w-2xl flex-grow">
+      <main className="flex flex-col items-center justify-center w-full max-w-4xl flex-grow">
         <ImageDisplay
-          imageUrl={imageUrl}
+          imageUrls={imageUrls}
           isLoading={isLoading}
           loadingMessage={loadingMessage}
           error={error}
